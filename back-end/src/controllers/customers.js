@@ -25,6 +25,8 @@ controller.retriveAll = async function (req, res) {
                 {name: 'asc'}
             ],
             include: [
+                // Mostra no JSON de resposta os carros que são do cliente
+                // http://localhost:8080/customers?include=car
                 {cars: get.query.include === 'cars'}
             ]
         })
@@ -41,7 +43,8 @@ controller.retriveAll = async function (req, res) {
 controller.retriveOne = async function(req, res) {
     try{
         const result = await prisma.customer.findUnique({
-            where: {id: Number(req.params.id)}
+            where: {id: Number(req.params.id)},
+            include: {cars: get.query.include === 'cars'}
         })
 
         //Encontrou -> retorna HTTP 200: OK (implícito)
