@@ -35,14 +35,16 @@ export default function CarForm() {
     plates: '',
     selling_date: null,
     selling_price: '',
+    customer_id: ''
   }
 
   const [state, setState] = React.useState({
     car: { ...formDefaults },
+    customers: [],
     formModified: false,
     inputErrors: {},
   })
-  const { car, formModified, inputErrors } = state
+  const { car, customers, formModified, inputErrors } = state
 
   const params = useParams()
   const navigate = useNavigate()
@@ -98,6 +100,7 @@ export default function CarForm() {
     try {
       // Invoca a validação dos dados da biblioteca Zod
       // por meio do model Car === '' ? '' : parseFloat(value)
+      if(car.selling_price === '') car.selling_price = null
 
       Car.parse(car)
       console.log(car)
@@ -138,19 +141,28 @@ export default function CarForm() {
     a função loadData() para buscar no back-end os dados do cliente a ser editado
   */
   React.useEffect(() => {
-    if (params.id) loadData()
+    loadData()
   }, [])
 
   async function loadData() {
     showWaiting(true)
     try {
-      const result = await myfetch.get(`/cars/${params.id}`)
+      let car = {...formDefaults}, customers = []
 
-      // Converte o formato de data armazenado no banco de dados
-      // para o formato reconhecido pelo componente DatePicker
-      result.birth_date = parseISO(result.birth_date)
+      // Busca a lista de cliente para preencher o combo de escolha do cliente que comprou o carro
+      customers = await fetch.get('/customers')
 
-      setState({ ...state, customer: result })
+      // Se houver paramentro na rota, precisamos buscar o carro para ser editado
+      if(params.id){
+        car = await myfetch.get(`/cars/${params.id}`)
+
+        // Converte o formato de data armazenado no banco de dados
+        // para o formato reconhecido pelo componente DatePicker
+        if(car.selling_date){
+          car.selling_date = parseISO(car.selling_date)
+        }
+      }
+      setState({ ...state, car, customers})
     } catch (error) {
       console.error(error)
       notify(error.message, 'error')
@@ -314,6 +326,26 @@ export default function CarForm() {
             helperText={inputErrors?.selling_price}
             error={inputErrors?.selling_price}
           />
+
+<TextField
+            name='customer_id'
+            label='Cliente'
+            variant='filled'
+            required
+            fullWidth
+            value={car.customer_id}
+            onChange={handleFieldChange}
+            select
+            helperText={inputErrors?.customer_id}
+            error={inputErrors?.customer_id}
+          >
+            {customers.map((s) => (
+              <MenuItem key={s.id} value={s.id}>
+                {s.name}
+              </MenuItem>
+            ))}
+          </TextField>
+
 
           <Box
             sx={{

@@ -20,7 +20,14 @@ controller.create = async function (req,res) {
 
 controller.retriveAll = async function (req, res) {
     try{
-        const result = await prisma.customer.findMany()
+        const result = await prisma.customer.findMany({
+            orderBy:[
+                {name: 'asc'}
+            ],
+            include: [
+                {cars: get.query.include === 'cars'}
+            ]
+        })
         res.send(result).end()
     }   
     catch(error){
