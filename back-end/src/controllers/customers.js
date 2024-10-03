@@ -19,25 +19,18 @@ controller.create = async function (req,res) {
 }
 
 controller.retriveAll = async function (req, res) {
-    try{
+    try {
         const result = await prisma.customer.findMany({
-            orderBy:[
-                {name: 'asc'}
-            ],
-            include: [
-                // Mostra no JSON de resposta os carros que são do cliente
-                // http://localhost:8080/customers?include=car
-                {cars: get.query.include === 'cars'}
-            ]
+            orderBy: [{ name: 'asc' }],
+            include: {
+                cars: req.query.include === 'cars'
+            }
         })
         res.send(result).end()
-    }   
-    catch(error){
+    } catch (error) {
         console.error(error)
-
-        //HTTP 500: Internal Server Error
         res.status(500).end()
-    } 
+    }
 }
 
 controller.retriveOne = async function(req, res) {

@@ -17,6 +17,9 @@ import Car from '../../models/car'
 import useConfirmDialog from '../../ui/useConfirmDialog'
 import useNotification from '../../ui/useNotification'
 import useWaiting from '../../ui/useWaiting'
+import IconButton from '@mui/material/IconButton'
+import InputAdornment from '@mui/material/InputAdornment'
+import BackspaceIcon from '@mui/icons-material/Backspace';
 
 export default function CarForm() {
   /*
@@ -184,6 +187,14 @@ export default function CarForm() {
     navigate('..', { relative: 'path', replace: true })
   }
 
+  function handleKeyDown(event){
+    if(event.key === 'Delete'){
+      const stateCopy = {...state}
+      stateCopy.car.customer_id = null
+      setState(stateCopy)
+    }
+  }
+
   return (
     <>
       <ConfirmDialog />
@@ -295,23 +306,23 @@ export default function CarForm() {
             dateAdapter={AdapterDateFns}
             adapterLocale={ptBR}
           >
-            <DatePicker
-              label='Data de venda'
-              value={car.selling_date}
-              onChange={(value) =>
-                handleFieldChange({
-                  target: { name: 'selling_date', value },
-                })
-              }
-              slotProps={{
-                textField: {
-                  variant: 'filled',
-                  fullWidth: true,
-                  helperText: inputErrors?.selling_date,
-                  error: inputErrors?.selling_date,
-                },
-              }}
-            />
+          <DatePicker
+            label='Data de venda'
+            value={car.selling_date}
+            onChange={(value) =>
+              handleFieldChange({
+                target: { name: 'selling_date', value },
+              })
+            }
+            slotProps={{
+              textField: {
+                variant: 'filled',
+                fullWidth: true,
+                helperText: inputErrors?.selling_date,
+                error: inputErrors?.selling_date,
+              },
+            }}
+          />
           </LocalizationProvider>
 
           <TextField
@@ -327,7 +338,7 @@ export default function CarForm() {
             error={inputErrors?.selling_price}
           />
 
-<TextField
+          <TextField
             name='customer_id'
             label='Cliente'
             variant='filled'
@@ -335,8 +346,9 @@ export default function CarForm() {
             fullWidth
             value={car.customer_id}
             onChange={handleFieldChange}
+            onKeyDown={handleKeyDown}
             select
-            helperText={inputErrors?.customer_id}
+            helperText={inputErrors?.customer_id || 'Tecle DEL para limpar o cliente  '}
             error={inputErrors?.customer_id}
           >
             {customers.map((s) => (
