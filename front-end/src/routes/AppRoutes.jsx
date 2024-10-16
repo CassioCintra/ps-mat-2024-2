@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
@@ -12,6 +13,9 @@ import CarList from '../pages/car/CarList'
 
 import CustomerForm from '../pages/customer/CustomerForm'
 import CustomerList from '../pages/customer/CustomerList'
+
+import UserForm from '../pages/user/UserForm'
+import UserList from '../pages/user/UserList'
 
 import About from '../pages/About'
 
@@ -28,6 +32,10 @@ export default function AppRoutes() {
     <Route path="/customers" element={<AuthGuard> <CustomerList /> </AuthGuard>} />
     <Route path="/customers/new" element={ <AuthGuard> <CustomerForm /> </AuthGuard> } />
     <Route path="/customers/:id" element={ <AuthGuard> <CustomerForm /> </AuthGuard> } />
+
+    <Route path="/users" element={<AuthGuard> <UserList /> </AuthGuard>} />
+    <Route path="/users/new" element={ <AuthGuard> <UserForm /> </AuthGuard> } />
+    <Route path="/users/:id" element={ <AuthGuard> <UserForm /> </AuthGuard> } />
 
     {/* 11. Crie uma rota para esse componente. */}
     <Route path="/about" element={ <About /> } />

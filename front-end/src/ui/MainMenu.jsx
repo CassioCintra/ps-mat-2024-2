@@ -49,10 +49,21 @@ export default function MainMenu() {
       requiresAuth: true
     },
     {
+      children: 'Listagem de Usuários',
+      to: '/users',
+      requiresAuth: true
+    },
+    {
+      children: 'Cadastro de usuários',
+      to: '/users/new',
+      divider: true,
+      requiresAuth: true
+    },
+    {
       children: 'Sobre o autor',
       to: '/about',
       divider: false
-    },
+    }
   ]
 
   return (
