@@ -1,5 +1,7 @@
 import { Prisma } from '@prisma/client'
 import prisma from '../database/client.js'
+import Car from '../models/car.js'
+import { z } from 'zod'
 
 const controller = {} //Objeto vazio
 
@@ -11,13 +13,21 @@ controller.create = async function (req,res) {
         //Preenche qual usuário modificou por último o carro com o id do usuário autenticado
         req.body.updated_user_id = req.authUser.id
 
-        await prisma.car.create({data: req.body})
+        await prisma.car.create({data: Car.parse(req.body)})
 
         //HTTP 201: Created
         res.status(201).end()
     }
     catch(error){
         console.error(error)
+
+        // HTTP 400 para erros de validação no Zod        
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({
+                message: "Erro na validação",
+                errors: error.errors,
+            })
+        }
 
         //HTTP 500: Internal server error
         res.status(500).end()
@@ -78,7 +88,7 @@ controller.update = async function(req,res) {
 
         const result = await prisma.car.update({
             where: {id: Number(req.params.id)},
-            data: req.body
+            data: Car.partial().parse(req.body)
         })
 
         //Encontrou e atualizou -> HTTP 204: No Content
@@ -88,6 +98,14 @@ controller.update = async function(req,res) {
     }
     catch(error){
         console.error(error)
+
+        // HTTP 400 para erros de validação no Zod        
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({
+                message: "Erro na validação",
+                errors: error.errors,
+            })
+        }
 
         //HTTP 500: Internal Server Error
         res.status(500).end()

@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client'
 import prisma from '../database/client.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import User  from '../models/user.js'
 
 const controller = {} //Objeto vazio
 
@@ -21,6 +22,14 @@ controller.create = async function (req, res) {
     catch (error) {
         console.error(error)
 
+        // HTTP 400 para erros do Zod
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({
+                message: "Erro na validação",
+                errors: error.errors,
+            })
+        }
+        
         //HTTP 500: Internal server error
         res.status(500).end()
     }
@@ -80,6 +89,14 @@ controller.update = async function (req, res) {
     }
     catch (error) {
         console.error(error)
+
+        // HTTP 400 para erros do Zod
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({
+                message: "Erro na validação",
+                errors: error.errors,
+            })
+        }
 
         //HTTP 500: Internal Server Error
         res.status(500).end()

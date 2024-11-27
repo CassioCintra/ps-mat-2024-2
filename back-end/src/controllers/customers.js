@@ -1,17 +1,27 @@
 import { Prisma } from '@prisma/client'
 import prisma from '../database/client.js'
+import Customer from '../models/customer.js'
+import { z } from 'zod'
 
 const controller = {} //Objeto vazio
 
 controller.create = async function (req,res) {
     try{
-        await prisma.customer.create({data: req.body})
+        await prisma.customer.create({data: Customer.parse(req.body)})
 
         //HTTP 201: Created
         res.status(201).end()
     }
     catch(error){
         console.error(error)
+        
+        // HTTP 400 para erros do Zod
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({
+                message: "Erro na validação",
+                errors: error.errors,
+            })
+        }
 
         //HTTP 500: Internal server error
         res.status(500).end()
@@ -57,7 +67,7 @@ controller.update = async function(req,res) {
     try{
         const result = await prisma.customer.update({
             where: {id: Number(req.params.id)},
-            data: req.body
+            data: Customer.partial().parse(req.body)
         })
 
         //Encontrou e atualizou -> HTTP 204: No Content
@@ -67,6 +77,14 @@ controller.update = async function(req,res) {
     }
     catch(error){
         console.error(error)
+
+        // HTTP 400 para erros do Zod
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({
+                message: "Erro na validação",
+                errors: error.errors,
+            })
+        }
 
         //HTTP 500: Internal Server Error
         res.status(500).end()
